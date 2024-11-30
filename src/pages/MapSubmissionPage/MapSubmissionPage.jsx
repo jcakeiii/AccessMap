@@ -58,3 +58,31 @@
 // export default MapSubmissionPage;
 
 // TESTTTTTTTTTTTTTTTTTTTT
+
+
+{/* Reviews List 
+{reviews.length > 0 && (
+    <div className="mt-4">
+      <h5 className="border-bottom pb-2 mb-3">
+        Reviews
+        <span className="badge bg-secondary ms-2">{reviews.length}</span>
+      </h5>
+      <div className="review-list">
+        {reviews.map((review, index) => (
+          <div key={index} className="card mb-3 border-light bg-light">
+            <div className="card-body">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <div className="text-warning">{renderStars()}</div>
+                <small className="text-muted">
+                  {new Date(review.createdAt).toLocaleDateString()}
+                </small>
+              </div>
+              <p className="card-text mb-0">{review.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+</div> */}

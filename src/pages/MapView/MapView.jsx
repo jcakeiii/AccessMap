@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'; 
 import { Button } from 'react-bootstrap';
 import MapSideBar from '../../components/MapSideBar/MapSideBar';
 import NavBar from '../../components/NavBar/NavBar';
-import MapComponent from "../../components/Map/MapComponent";
+import MapComponent from '../../components/Map/MapComponent';
 
 export const MapView = () => {
     const location = useLocation();
@@ -25,8 +25,7 @@ export const MapView = () => {
             console.log("Setting position:", position)
         } else {
             console.error("Invalid building data:", building);
-            // Optionally, navigate back to the search page or show an error message
-            // navigate('/search');
+            // navigate back to the search page or show an error message?
         }
     }, [location.state, navigate]);
 
