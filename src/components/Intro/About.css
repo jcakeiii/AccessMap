@@ -1,0 +1,57 @@
+.about-section {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .about-content h2, .how-to-use h3 {
+    background: linear-gradient(45deg, #12c2e9, #c471ed, #f64f59);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: hue 10s infinite linear;
+  }
+  
+  @keyframes hue {
+    from {
+      filter: hue-rotate(0deg);
+    }
+    to {
+      filter: hue-rotate(360deg);
+    }
+  }
+  
+  .feature-card, .how-to-use-card {
+    background-color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .feature-card:hover, .how-to-use-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .about-description, .contribution-note {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .how-to-use-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .how-to-use-card .small {
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 767px) {
+    .about-section {
+      padding-top: 2rem;
+      padding-bottom: 2rem;
+    }
+  }
