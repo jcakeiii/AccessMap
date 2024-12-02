@@ -10,11 +10,12 @@ export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [buildings, setBuildings] = useState([]);
   const [fuse, setFuse] = useState(null);
-  const [suggestions, setSuggestions] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [suggestions, setSuggestions] = useState([]); // State to track suggestions
+  const [showDropdown, setShowDropdown] = useState(false); // State to track dropdown menu 
   const navigate = useNavigate(); 
   const dropdownRef = useRef(null);
 
+  // Fetch buildings from database
   useEffect(() => {
     const fetchBuildings = async () => {
       const buildingsCollection = collection(db, 'Buildings');
@@ -35,6 +36,7 @@ export const SearchBar = () => {
     fetchBuildings();
   }, []);
 
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -60,6 +62,7 @@ export const SearchBar = () => {
     }
   }, 300);
 
+  // Handle search while typing 
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -108,8 +111,7 @@ return (
             value={searchTerm}
             onChange={handleSearchChange}
             onFocus={() => setShowDropdown(searchTerm.length > 0)}
-            style={{ flexGrow: 1 }}
-          />
+            style={{ flexGrow: 1 }}/>
           <Button variant="primary" onClick={handleSearchSubmit}>
             Search
           </Button>
@@ -153,10 +155,7 @@ return (
               style={{
                 padding: '10px 15px',
                 color: '#6c757d'
-              }}
-            >
-              No buildings found
-            </div>
+              }}> No buildings found </div>
           )}
         </div>
       )}

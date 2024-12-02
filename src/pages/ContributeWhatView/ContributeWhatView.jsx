@@ -114,8 +114,7 @@ const ContributeWhatView = () => {
               value={searchTerm}
               onChange={handleSearchChange}
               onFocus={() => setShowDropdown(searchTerm.length > 0)}
-              style={{ flexGrow: 1, padding: '10px', fontSize: '16px' }} // Shortened the search bar height
-            />
+              style={{ flexGrow: 1, padding: '0.5rem' }}/>
             <Button variant="primary" onClick={handleSearchSubmit}>
               Search
             </Button>
@@ -126,14 +125,13 @@ const ContributeWhatView = () => {
         {showDropdown && (
           <div 
             ref={dropdownRef}
-            className="position-relative w-100"
+            className="position-absolute w-100"
             style={{
               zIndex: 1000,
               maxWidth: '500px', // Matching max width of search bar
               backgroundColor: 'white',
               border: '1px solid #ced4da',
               borderRadius: '0.25rem',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
               maxHeight: '300px',
               overflowY: 'auto'
             }}

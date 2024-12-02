@@ -1,19 +1,25 @@
-import { useState, useEffect } from 'react';
+// Submission sidebar to submit feature type. SubmitView's child component 
+import { useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { ClipboardListIcon, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { db } from "../../config/firebase";
 import { collection, doc, addDoc, GeoPoint } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../config/firebase";
 import { ToastContainer, toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; // Generate id for image
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // Set max image size to 2 MB 
+const MAX_WORDS = 50; // Set max word count for description 
 const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition, setFeatureType, clickedPosition }) => {
     const [formData, setFormData] = useState({
         featureType: '',
         description: '',
         imageUrl: null
   });
+  const [imageError, setImageError] = useState(''); // Error for image size 
+  const [wordCount, setWordCount] = useState(0); // Word count for description
+  const [descriptionError, setDescriptionError] = useState(''); // Error for word limit
   const buildingRef = doc(db, 'Buildings', building.id);
 
     const handleFeatureTypeChange = (e) => {
@@ -25,7 +31,28 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setFormData(prev => ({ ...prev, image: file }));
+        if (file && file.size > MAX_FILE_SIZE) {
+          setImageError('Image size exceeds 2 MB. Please upload a smaller image ');
+          setFormData((prev) => ({ ...prev, image: null }));
+        } else {
+          setImageError('');
+          setFormData((prev) => ({ ...prev, image: file }));
+        }
   };
+    const handleDescriptionChange = (e) => {
+      const input = e.target.value;
+      const words = input.trim().split(/\s+/).filter((word) => word); // Split by spaces and filter empty strings
+      const wordCount = words.length;
+
+      if (wordCount > MAX_WORDS) {
+        setDescriptionError(`Description cannot exceed ${MAX_WORDS} words.`);
+      } else {
+        setDescriptionError('');
+      }
+
+      setWordCount(wordCount);
+      setFormData((prev) => ({ ...prev, description: input }));
+    };
 
     const handleSubmit = async(e) => {
         e.preventDefault();
@@ -36,14 +63,22 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
             });
             return;
         }
+        // Validate description word count 
+        if (descriptionError) {
+          toast.error("Please make sure description does not exceed 50 words.", {
+            position: "top-center",
+        });
+          return;
+        }
         
+        // Validate feature type
         if (formData.featureType === '') {
             toast.error("Please select an accessibility feature type", {
                 position: "top-center",
             });
             return;
         }
-
+        // Validate description
         if (formData.description === '') {
             toast.error("Please add a description for your accessibility feature", 
             { position: "top-center" 
@@ -51,6 +86,10 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
             return;
         }
         let imageUrls = [];
+        if (imageError) {
+          console.log(imageError); 
+          return; // Prevent form submission if there's an image error
+        }
         if (formData.image) {
             // Upload the image to Firebase Storage
             const imageRef = ref(storage, `featureImages/${uuidv4()}`); // Use uuid to generate a unique image name
@@ -82,7 +121,7 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
             position: "top-center",
             });
 
-            // Reset form fields
+            // Reset form fields after submitting
             setFormData({ featureType: '', description: '', image: null, createdAt: null})
         } catch (error) {
             console.error('Error adding document: ', error);
@@ -147,9 +186,16 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
               rows={3}
               placeholder="Enter location description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              required
-            />
+              onChange={handleDescriptionChange}
+              required />
+            <p className="text-muted mt-1" style={{ fontSize: '0.9rem' }}>
+              Word count: {wordCount}/{MAX_WORDS}
+            </p>
+            {descriptionError && (
+              <p className="text-danger" style={{ fontSize: '0.9rem' }}>
+                {descriptionError}
+              </p>
+            )}
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -169,6 +215,11 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
                 </div>
               </label>
             </div>
+            {imageError && (
+              <p className="text-danger mt-2" style={{ fontSize: '0.9rem' }}>
+                {imageError}
+              </p>
+            )}
           </Form.Group>
 
           <Button 

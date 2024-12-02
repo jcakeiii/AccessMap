@@ -1,3 +1,4 @@
+// Map sidebar to show available features 
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 
@@ -12,16 +13,14 @@ export const MapSideBar = ({ isOpen, onClose, title, children }) => {
                 maxWidth: '90%',
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 zIndex: 100
-            }}
-        >
+            }}>
             <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                     <h2>{title}</h2>
                     <Button 
                         variant="outline-secondary" 
                         size="sm"
-                        onClick={onClose}
-                    >
+                        onClick={onClose}>
                         ×
                     </Button>
                 </div>

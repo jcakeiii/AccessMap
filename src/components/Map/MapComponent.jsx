@@ -1,9 +1,53 @@
-import { useState } from "react";
-import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
+// Map Component, handles everything: Show current location, submit feature type, display pop-up windows, 
+// display searching for routes 
+import { useEffect, useState } from "react";
+import { APIProvider, Map, AdvancedMarker, useMapsLibrary, useMap } from '@vis.gl/react-google-maps';
 import InfoPopup from "../InfoPopup/InfoPopup";
 import { useMarkers } from '../../hooks/useMarkers';
-import Directions from '../../hooks/Directions';
+import { toast, ToastContainer } from "react-toastify"; 
 
+
+// Directions function for searching routes, merged with map component for easy communication 
+const Directions = ({ origin, destination, travelMode }) => {
+    const map = useMap();
+    const routesLibrary = useMapsLibrary("routes");
+    const [directionsService, setDirectionsService] = useState();
+    const [directionsRenderer, setDirectionsRenderer] = useState();
+    const [routes, setRoutes] = useState([]); 
+    const [routeIndex, setRouteIndex] = useState(0); 
+    const selected = routes[routeIndex]; 
+    const leg = selected?.legs[0]; 
+
+    useEffect(() => {
+        if (!routesLibrary || !map) return;
+        const renderer = new routesLibrary.DirectionsRenderer({
+            map,
+            draggable: true,
+        });
+        setDirectionsService(new routesLibrary.DirectionsService());
+        setDirectionsRenderer(renderer);
+    }, [routesLibrary, map]);
+
+    useEffect(() => {
+        if (!directionsService || !directionsRenderer || !origin || !destination) return;
+
+        directionsService.route({
+            origin,
+            destination,
+            travelMode: travelMode || google.maps.TravelMode.WALKING,
+            provideRouteAlternatives: true,
+        }).then(response => {
+            directionsRenderer.setDirections(response);
+            setRoutes(response.routes);
+        }).catch(error => {
+            console.error("Error fetching directions:", error);
+        });
+    }, [directionsService, directionsRenderer, origin, destination, travelMode]);
+
+    if (!leg) return null; 
+};
+
+// Map Component 
 export const MapComponent = ({ 
     building, 
     position, 
@@ -61,8 +105,7 @@ export const MapComponent = ({
                     zoomControl={true} 
                     scaleControl={true} 
                     mapId={import.meta.env.VITE_GOOGLE_MAPS_ID}
-                    onClick={handleMapClickEvent}
-                >
+                    onClick={handleMapClickEvent} >
                     {/* Directions component with dynamic props */}
                     <Directions 
                         origin={originPlaceId} 
@@ -91,13 +134,11 @@ export const MapComponent = ({
                         <AdvancedMarker
                             key={marker.id}
                             position={marker.position}
-                            onClick={() => handleMarkerSelect(marker)}
-                        >
+                            onClick={() => handleMarkerSelect(marker)} >
                             <img 
                                 src={getMarkerIcon(marker.type)} 
                                 style={{ width: "30px", height: "30px" }} 
-                                alt={marker.type}
-                            />
+                                alt={marker.type} />
                         </AdvancedMarker>
                     ))}
 

@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { auth, googleProvider } from "../../config/firebase";
+import { auth, googleProvider, db } from "../../config/firebase";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { ToastContainer, toast } from 'react-toastify';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-toastify/dist/ReactToastify.css';
+import { doc, setDoc, getDoc } from "firebase/firestore"
+import { ToastContainer, toast } from "react-toastify";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import NavBar from "../../components/NavBar/NavBar";
+import Footer from "../../components/Footer/Footer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
 
 
 export const SignIn = () => {
@@ -32,11 +35,32 @@ export const SignIn = () => {
 
     const signInWithGoogle = async () => {
         try {
-            await signInWithPopup(auth, googleProvider);
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            // Check if email is a depauw.edu email
+            if (!user.email.endsWith("@depauw.edu")) {
+                setError("Please use your DePauw email address (@depauw.edu).");
+                await auth.signOut(); // Sign out the user
+                return;
+            }
+            // Check if the user exists in the database
+            const userDoc = doc(db, "Users", user.uid);
+            const userSnapshot = await getDoc(userDoc);
+
+            if (!userSnapshot.exists()) {
+                // Create a new user document if it doesn't exist
+                await setDoc(userDoc, {
+                    email: user.email,
+                    firstName: user.displayName?.split(" ")[0] || "",
+                    lastName: user.displayName?.split(" ")[1] || "",
+                    photo: user.photoURL || "",
+                });
+                toast.success("Account created successfully!", {
+                    position: "top-center",
+                });
+            }
             window.location.href = "/";
-            toast.success("Logged in successfully!", {
-                position: "top-center",
-            });
         } catch (error) {
             console.log(error.message);
             setError(error.message);
@@ -47,6 +71,8 @@ export const SignIn = () => {
     };
 
     return (
+        <>
+        <NavBar />
         <Container className="mt-5">
             <Row className="justify-content-center">
                 <Col md={6}>
@@ -91,6 +117,8 @@ export const SignIn = () => {
             </Row>
             <ToastContainer/>
         </Container>
+        <Footer/>
+        </>
     );
 };
 

@@ -1,10 +1,10 @@
 // Submitting a new feature view
-import { useState, useEffect } from "react";
+// SubmissionSidebar and MapComponent's parent component 
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
 import SubmissionSidebar from '../../components/SubmissionSideBar/SubmissionSidebar';
 import NavBar from '../../components/NavBar/NavBar';
-import MapComponent from "../../components/Map/MapComponent";
+import MapComponent from '../../components/Map/MapComponent';
 
 export const SubmitView = () => {
     const location = useLocation();
@@ -12,11 +12,7 @@ export const SubmitView = () => {
     const [currBuilding, setCurrBuilding] = useState(null);
     const [position, setPosition] = useState(null);
     const [clickedPosition, setClickedPosition] = useState(null);  // State to track clicked position
-    const [featureType, setFeatureType] = useState(null);
-
-    const handleMapClick = (position) => {
-        setClickedPosition(position);
-    };
+    const [featureType, setFeatureType] = useState(null); // State to track feature type chosen by user
 
     useEffect(() => {
         const building = location.state?.building;
@@ -32,10 +28,15 @@ export const SubmitView = () => {
     }, [location.state, navigate]);
 
     if (!currBuilding || !position) {
-        return <div>Loading... or Invalid building data. Please try searching again.</div>;
+        return (
+            <div className="alert alert-warning text-center" role="alert">
+                Sorry, the location you search for is incorrect or is no longer available.
+                Please try searching again.
+            </div>
+        );
     }
 
-    return (
+return (
         <div className="position-relative vh-100 vw-100">
             <NavBar />
             <div className="h-100 w-100">

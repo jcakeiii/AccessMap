@@ -5,7 +5,6 @@ import MapSideBar from "../../components/MapSideBar/MapSideBar";
 import NavBar from '../../components/NavBar/NavBar';
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
-import { AdvancedMarker, Pin } from '@vis.gl/react-google-maps';
 
 const MyLocationView = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,7 +43,9 @@ const MyLocationView = () => {
         <div className="position-relative h-100 w-100">
             <NavBar />
             <div className="content-below-navbar h-100 w-100">
-                <MapComponent building={null} position={userLocation} userLocation={userLocation}/>
+                {/* Renders only when userLocation is not null */}
+                {userLocation && (
+                <MapComponent building={null} position={userLocation} userLocation={userLocation}/> )}
 
                 {/* Sidebar component */}
                 <MapSideBar title="Features at This Location" isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
@@ -56,8 +57,7 @@ const MyLocationView = () => {
                         variant="light"
                         className="position-absolute top-0 start-0 m-2 shadow"
                         style={{ zIndex: 1000 }}
-                        onClick={() => setSidebarOpen(true)}
-                    >
+                        onClick={() => setSidebarOpen(true)}>
                         ☰
                     </Button>
                 )}

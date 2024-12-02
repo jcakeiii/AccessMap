@@ -1,5 +1,6 @@
-// useMarkers hook fetches markers data and populate the map + handle icon logic 
-import { useState, useEffect } from 'react';
+// useMarkers hook fetches markers data and populate the map when a building's map renders + handle icon logic 
+// Working on fetching nearby markers
+import { useState, useEffect } from "react";
 import { db } from "../config/firebase";
 import { collection, doc, getDocs, query, where } from "firebase/firestore";
 
@@ -54,7 +55,7 @@ export const useMarkers = (building) => {
         }
     };
     // Working on fetching nearby markers
-    // Query to look for coordinates within a certain range. 
+    // Query to look for coordinates within a certain range 
     const fetchNearbyMarkers = async (bounds) => {
         const { minLng, maxLng, minLat, maxLat } = bounds;
         const featuresRef = collection(db, "accessibilityFeatures");

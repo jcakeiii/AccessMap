@@ -6,7 +6,10 @@ const Directions = ({ origin, destination, travelMode }) => {
     const routesLibrary = useMapsLibrary("routes");
     const [directionsService, setDirectionsService] = useState();
     const [directionsRenderer, setDirectionsRenderer] = useState();
-    const [routes, setRoutes] = useState([]);
+    const [routes, setRoutes] = useState([]); 
+    const [routeIndex, setRouteIndex] = useState(0);
+    const selected = routes[routeIndex];
+    const leg = selected?.leg[0]; 
 
     useEffect(() => {
         if (!routesLibrary || !map) return;

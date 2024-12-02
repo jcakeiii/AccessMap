@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import Directions from '../../hooks/Directions';
 
 const RoutingSidebar = ({ setOriginPlaceId, setDestinationPlaceId, setTravelMode }) => {
   const [origin, setOrigin] = useState('');
@@ -47,7 +46,7 @@ const RoutingSidebar = ({ setOriginPlaceId, setDestinationPlaceId, setTravelMode
   const handleSubmit = (e) => {
     e.preventDefault();
     if (origin && destination) {
-      setOriginPlaceId(origin); // set the actual place ID 
+      setOriginPlaceId(origin); // Set the actual place ID 
       setDestinationPlaceId(destination); 
       console.log("Searching route from", origin, "to", destination);
     }
@@ -86,8 +85,7 @@ const RoutingSidebar = ({ setOriginPlaceId, setDestinationPlaceId, setTravelMode
             type="text"
             placeholder="Search origin building..."
             value={origin}
-            onChange={handleInputChange('origin')}
-          />
+            onChange={handleInputChange('origin')} />
         </Form.Group>
 
         <Form.Group className="mb-4">
@@ -97,8 +95,7 @@ const RoutingSidebar = ({ setOriginPlaceId, setDestinationPlaceId, setTravelMode
             type="text"
             placeholder="Search destination building..."
             value={destination}
-            onChange={handleInputChange('destination')}
-          />
+            onChange={handleInputChange('destination')} />
         </Form.Group>
 
         <Button
@@ -106,8 +103,7 @@ const RoutingSidebar = ({ setOriginPlaceId, setDestinationPlaceId, setTravelMode
           type="submit"
           className="w-100 mt-2"
           disabled={!origin || !destination}
-          onClick={handleSubmit}
-        >
+          onClick={handleSubmit}>
           Find Route
         </Button>
       </Form>
