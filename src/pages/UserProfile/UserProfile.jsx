@@ -83,7 +83,6 @@ const UserProfile = () => {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    // Add your profile update logic here
   };
 
   const handleDeleteContribution = async (contributionId) => {
