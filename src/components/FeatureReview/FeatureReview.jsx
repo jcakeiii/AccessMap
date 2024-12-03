@@ -14,7 +14,10 @@ const FeatureReview = ({ feature, onReviewSubmit }) => {
     const [hoverRating, setHoverRating] = useState(0);
     const [reviews, setReviews] = useState([]);
     const [averageRating, setAverageRating] = useState(0);
-
+    const [wordCount, setWordCount] = useState(0); // Word count for description
+    const [error, setError] = useState(''); 
+    const [user, setUser] = useState(null);
+    const MAX_WORDS = 50;
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -59,8 +62,21 @@ const FeatureReview = ({ feature, onReviewSubmit }) => {
         );
     };
 
-    const handleReviewChange = (e) => setReviewText(e.target.value);
-
+    const handleReviewChange = (e) => {
+        const inputText = e.target.value;
+        const words = inputText.trim().split(/\s+/).filter((word) => word);
+        const wordCount = words.length;
+      
+        if (wordCount > MAX_WORDS) {
+          setError("Review cannot exceed 50 words.");
+          setWordCount(MAX_WORDS);
+        } else {
+          setError(null);
+        }
+          setReviewText(inputText);
+          setWordCount(wordCount);
+    }
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         const review = { 
@@ -121,13 +137,20 @@ const FeatureReview = ({ feature, onReviewSubmit }) => {
                             placeholder="Share your experience..."
                             value={reviewText}
                             onChange={handleReviewChange}
-                            required
-                        />
+                            required/>
+                        <p className="text-muted mt-1" style={{ fontSize: '0.9rem' }}>
+                            Word count: {wordCount}/{MAX_WORDS}
+                        </p>
+                        {error && (
+                        <p className="text-danger" style={{ fontSize: '0.9rem' }}>
+                            {error}
+                        </p>
+                        )}
                     </div>
 
                     {/* Submit Button */}
                     <div className="d-grid gap-2">
-                        <Button type="submit" className="btn btn-primary" disabled={!rating || !reviewText.trim()}>
+                        <Button type="submit" className="btn btn-primary" disabled={!rating || !reviewText.trim() || error}>
                             Submit Review
                         </Button>
                     </div>

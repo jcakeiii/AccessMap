@@ -40,7 +40,7 @@ export const MapView = () => {
                 <MapComponent building={currBuilding} position={position} />
 
                 {/* Sidebar component */}
-                <MapSideBar title="Features at This Location" isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+                <MapSideBar building={currBuilding} title="Features at This Location" isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
                     <ul>
                         <li>Elevator</li>
                         <li>Ramp</li>

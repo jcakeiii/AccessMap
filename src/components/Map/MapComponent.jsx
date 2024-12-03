@@ -6,7 +6,6 @@ import InfoPopup from "../InfoPopup/InfoPopup";
 import { useMarkers } from '../../hooks/useMarkers';
 import { toast, ToastContainer } from "react-toastify"; 
 
-
 // Directions function for searching routes, merged with map component for easy communication 
 const Directions = ({ origin, destination, travelMode }) => {
     const map = useMap();
@@ -15,8 +14,6 @@ const Directions = ({ origin, destination, travelMode }) => {
     const [directionsRenderer, setDirectionsRenderer] = useState();
     const [routes, setRoutes] = useState([]); 
     const [routeIndex, setRouteIndex] = useState(0); 
-    const selected = routes[routeIndex]; 
-    const leg = selected?.legs[0]; 
 
     useEffect(() => {
         if (!routesLibrary || !map) return;
@@ -26,6 +23,19 @@ const Directions = ({ origin, destination, travelMode }) => {
         });
         setDirectionsService(new routesLibrary.DirectionsService());
         setDirectionsRenderer(renderer);
+
+        renderer.addListener("directions_changed", () => {
+            const updatedDirections = renderer.getDirections();
+            if (updatedDirections && onRouteChange) {
+                onRouteChange({
+                    routes: updatedDirections.routes.map(route => ({
+                        distance: route.legs[0].distance.text,
+                        duration: route.legs[0].duration.text,
+                        steps: route.legs[0].steps.map(step => step.instructions)
+                    }))
+                });
+            }
+        });
     }, [routesLibrary, map]);
 
     useEffect(() => {
@@ -39,12 +49,26 @@ const Directions = ({ origin, destination, travelMode }) => {
         }).then(response => {
             directionsRenderer.setDirections(response);
             setRoutes(response.routes);
+            
+            // Callback to pass route information to parent
+            if (onRoutesFound) {
+                onRoutesFound({
+                    origin,
+                    destination,
+                    travelMode,
+                    routes: response.routes.map(route => ({
+                        distance: route.legs[0].distance.text,
+                        duration: route.legs[0].duration.text,
+                        steps: route.legs[0].steps.map(step => step.instructions)
+                    }))
+                });
+            }
         }).catch(error => {
             console.error("Error fetching directions:", error);
         });
     }, [directionsService, directionsRenderer, origin, destination, travelMode]);
 
-    if (!leg) return null; 
+    return null; 
 };
 
 // Map Component 
@@ -57,9 +81,13 @@ export const MapComponent = ({
     userLocation, 
     originPlaceId, 
     destinationPlaceId, 
-    travelMode 
+    travelMode, 
+    onRouteSave,
+    updateSidebarRoutes 
 }) => {
+
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [currentRoute, setCurrentRoute] = useState(null);
     const { 
         markers, 
         selectedMarker, 
@@ -148,8 +176,7 @@ export const MapComponent = ({
                             position={selectedMarker.position}
                             feature={selectedMarker}
                             onClose={handleCloseInfoPopup}
-                            isOpen={isPopupOpen}
-                        />
+                            isOpen={isPopupOpen} />
                     )}
                 </Map>
             </div>

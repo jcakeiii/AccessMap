@@ -1,9 +1,10 @@
-// Submission sidebar to submit feature type. SubmitView's child component 
-import { useState } from 'react';
+// Submission sidebar to submit feature type. SubmitView's child component, communicates with Map component
+import { useState, useEffect } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { Upload } from 'lucide-react';
 import { db } from "../../config/firebase";
-import { collection, doc, addDoc, GeoPoint } from "firebase/firestore";
+import { collection, doc, addDoc, GeoPoint, getFirestore, updateDoc, arrayUnion } from "firebase/firestore";
+import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../config/firebase";
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,12 +16,32 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
     const [formData, setFormData] = useState({
         featureType: '',
         description: '',
-        imageUrl: null
+        imageUrl: null, 
+        user: null,
   });
   const [imageError, setImageError] = useState(''); // Error for image size 
   const [wordCount, setWordCount] = useState(0); // Word count for description
   const [descriptionError, setDescriptionError] = useState(''); // Error for word limit
+  const [user, setUser] = useState(null); 
+
+  const auth = getAuth();
+  const db = getFirestore();
+
   const buildingRef = doc(db, 'Buildings', building.id);
+
+  // Listen for logged-in user changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const userDocRef = doc(db, "Users", currentUser.uid); // References the user document
+        setUser(userDocRef); // Set state to store the reference
+      } else {
+        setUser(null);
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [auth, db]);
 
     const handleFeatureTypeChange = (e) => {
         const newfeatureType = e.target.value;
@@ -41,7 +62,7 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
   };
     const handleDescriptionChange = (e) => {
       const input = e.target.value;
-      const words = input.trim().split(/\s+/).filter((word) => word); // Split by spaces and filter empty strings
+      const words = input.trim().split(/\s+/).filter((word) => word); // Split by spaces and filter empty strings to count words
       const wordCount = words.length;
 
       if (wordCount > MAX_WORDS) {
@@ -88,7 +109,7 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
         let imageUrls = [];
         if (imageError) {
           console.log(imageError); 
-          return; // Prevent form submission if there's an image error
+          return;
         }
         if (formData.image) {
             // Upload the image to Firebase Storage
@@ -108,12 +129,20 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
                 type: formData.featureType,
                 description: formData.description,
                 createdAt: new Date(),  // Add timestamp
+                user, 
                 imageUrl: imageUrls
             };
 
             // Add to Firestore
             const accessibilityFeaturesRef = collection(db, 'accessibilityFeatures');
             const docRef = await addDoc(accessibilityFeaturesRef, featureData);
+
+            if (user) {
+              await updateDoc(user, {
+                contributions: arrayUnion(docRef.id), // Add feature ID to contributions array
+              });
+              console.log("User contributions updated.");
+            }
             
             console.log("Feature added with ID: ", docRef.id);
             console.log("Submitted Successfully!");
@@ -122,7 +151,7 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
             });
 
             // Reset form fields after submitting
-            setFormData({ featureType: '', description: '', image: null, createdAt: null})
+            setFormData({ featureType: '', description: '', image: null, createdAt: null, user: null})
         } catch (error) {
             console.error('Error adding document: ', error);
             toast.error("Error submitting a new feature. Please try again.", 
@@ -132,16 +161,16 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
     };
 
     const sidebarStyle = {
-        position: 'fixed',
-        left: 0,
-        top: navbarHeight, 
-        height: `calc(100vh - ${navbarHeight})`,
-        width: '35%',
-        backgroundColor: 'white',
-        boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
-        transition: 'transform 0.3s ease-in-out',
-        zIndex: 1000,
-        overflowY: 'auto'
+      position: 'fixed',
+      top: `${navbarHeight}`, // Assuming `navbarHeight` is defined
+      left: 0,
+      height: `calc(100vh - ${navbarHeight})`,
+      width: '35%',
+      backgroundColor: 'white',
+      boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+      transition: 'transform 0.3s ease-in-out',
+      zIndex: 1000,
+      overflowY: 'auto',
     };
 
     const imageUploadStyle = {
@@ -158,6 +187,10 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
         <h4 className="text-center mb-4">
           Thank you for your contribution to AccessMap!
         </h4>
+        <p className="text-muted">Your valuable contribution keeps AccessMap going.
+          AccessMap relies solely on community contribution to run, therefore, please be as accurate as possible
+          with your upload. 
+        </p>
         
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
@@ -227,6 +260,7 @@ const SubmissionSidebar = ({ navbarHeight = '56px', building, setClickedPosition
             type="submit" 
             className="w-100 mt-3"
             onClick={handleSubmit}
+            disabled={imageError || descriptionError}
           >
             Submit
           </Button>

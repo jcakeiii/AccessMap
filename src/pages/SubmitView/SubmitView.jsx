@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import SubmissionSidebar from '../../components/SubmissionSideBar/SubmissionSidebar';
 import NavBar from '../../components/NavBar/NavBar';
+import Footer from '../../components/Footer/Footer'
 import MapComponent from '../../components/Map/MapComponent';
 
 export const SubmitView = () => {
@@ -36,25 +37,28 @@ export const SubmitView = () => {
         );
     }
 
-return (
-        <div className="position-relative vh-100 vw-100">
+    return (
+        <>
+        <div className="d-flex flex-column vh-100">
             <NavBar />
-            <div className="h-100 w-100">
+            <div className="d-flex flex-grow-1">
                 <SubmissionSidebar 
                     building={currBuilding} 
                     clickedPosition={clickedPosition} 
                     featureType={featureType}
-                    setFeatureType={setFeatureType}  />
-                <div>
-                    <MapComponent 
+                    setFeatureType={setFeatureType}  
+                />
+                <MapComponent 
                     building={currBuilding} 
                     position={position} 
                     handleMapClick={setClickedPosition} 
                     clickedPosition={clickedPosition}
-                    featureType={featureType}/>
-                </div>
+                    featureType={featureType}
+                />
             </div>
         </div>
+        <Footer />
+        </>
     );
 };
 

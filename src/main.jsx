@@ -11,6 +11,7 @@ import MyLocationView from './pages/MyLocationView/MyLocationView.jsx';
 import ContributeWhatView from './pages/ContributeWhatView/ContributeWhatView.jsx';
 import RoutingView from './pages/RoutingView/RoutingView.jsx';
 import SubmitBuildingView from './pages/SubmitBuildingView/SubmitBuildingView.jsx';
+import UserProfile from './components/UserProfile/UserProfile.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/map-view" element={<MapView/>}/>
         <Route path="/search-routes" element={<RoutingView/>}/>
         <Route path="/submit-building" element={<SubmitBuildingView/>}/>
+        <Route path="/my-account" element={<UserProfile/>}/>
       </Routes>
     </BrowserRouter>
   </StrictMode>,

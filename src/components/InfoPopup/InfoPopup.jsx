@@ -7,7 +7,7 @@ import { Carousel } from "react-bootstrap";
 import { Star } from 'lucide-react';
 import FeatureReview from '../FeatureReview/FeatureReview'
 
-// pass current feature on info popup to feature review component?
+// pass current feature on info popup to feature review component
 const InfoPopup = ({ position, feature, onClose }) => {
   const [imageUrls, setImageUrls] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

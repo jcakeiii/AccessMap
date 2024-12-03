@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { auth } from "../../config/firebase";
 import { signOut } from "firebase/auth";
 import { Link } from "react-router-dom";
+import SearchBar from "../SearchBar/SearchBar"
 import { ToastContainer, toast } from 'react-toastify';
 
 const NavBar = () => {
@@ -33,29 +34,27 @@ const NavBar = () => {
   return (
     <Navbar expand="lg">
       <Container className="w-60">
-        <Navbar.Brand href="/">AccessMap</Navbar.Brand>
+        <Navbar.Brand href="/">
+        <img
+        src="../../src/assets/AccessMap logo (2).png"
+        alt="AccessMap Logo"
+        height="40"
+        className="d-inline-block align-top"/></Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto gap-3">
+          <Nav className="me-auto gap-2">
             <Nav.Link href="#about">About</Nav.Link>
             <Nav.Link href="/my-location">My Location</Nav.Link>
             <Nav.Link
               href="https://www.depauw.edu/academics/academic-resources/student-accessibility/"
               target="_blank"
-              rel="noopener noreferrer"
-            >
+              rel="noopener noreferrer">
               Resources
             </Nav.Link>
           </Nav>
-          <Form className="d-flex mx-auto">
-            <FormControl
-              type="search"
-              placeholder="Enter a building name..."
-              className="me-2"
-              aria-label="Search"
-            />
-            <Button variant="outline-primary">Search</Button>
-          </Form>
+          <div className="justify-content-center" style={{ flex: 2, width: '100%' }}>
+            <SearchBar />
+          </div>
           <Nav className="ms-auto gap-3">
             <Link to="/contribute">
               <Button variant="warning">Contribute</Button>

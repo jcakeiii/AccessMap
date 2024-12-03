@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import RoutingSidebar from '../../components/RoutingSidebar/RoutingSidebar';
 import MapComponent from '../../components/Map/MapComponent';
 import NavBar from '../../components/NavBar/NavBar';
+import Footer from '../../components/Footer/Footer'; 
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -43,6 +44,7 @@ const RoutingView = () => {
 }, []);
 
   return (
+    <>
     <div className="position-relative h-100 w-100">
       <NavBar/>
       <div className="content-below-navbar h-100 w-100">
@@ -53,7 +55,8 @@ const RoutingView = () => {
           position={userLocation}
           originPlaceId={originPlaceId}
           destinationPlaceId={destinationPlaceId}
-          travelMode={travelMode}/> )}
+          travelMode={travelMode}
+          /> )}
         
         {/* Sidebar to set origin, destination, and travel mode */}
         <RoutingSidebar
@@ -64,6 +67,8 @@ const RoutingView = () => {
         <ToastContainer/>
       </div>
     </div>
+    <Footer/>
+    </>
   );
 };
 
